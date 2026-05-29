@@ -54,7 +54,7 @@ export function MemberFormModal({
   }, [open, mode, member]);
 
   const clearFollowUp = () => {
-    setForm((prev) => ({
+    setForm((prev: MemberFormValues) => ({
       ...prev,
       followUpDue: "",
       followUpLabel: "",
@@ -63,7 +63,7 @@ export function MemberFormModal({
   };
 
   const addFollowUp = () => {
-    setForm((prev) => ({
+    setForm((prev: MemberFormValues) => ({
       ...prev,
       followUpDue: prev.followUpDue || defaultFollowUpDate(),
       followUpLabel: prev.followUpLabel || "复查",
@@ -101,7 +101,7 @@ export function MemberFormModal({
   };
 
   const set = (key: keyof MemberFormValues, value: string) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm((prev: MemberFormValues) => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -158,7 +158,7 @@ export function MemberFormModal({
               avatarImage: form.avatarImage,
             }}
             onChange={(patch) =>
-              setForm((prev) => ({ ...prev, ...patch }))
+              setForm((prev: MemberFormValues) => ({ ...prev, ...patch }))
             }
           />
 

@@ -53,10 +53,18 @@ export function pickAvatarColor(existing: FamilyMemberProfile[]): string {
   return free?.hex ?? AVATAR_COLOR_OPTIONS[existing.length % AVATAR_COLOR_OPTIONS.length].hex;
 }
 
-export function emptyMemberForm(): Omit<
-  FamilyMemberProfile,
-  "id"
-> & { avatarColor: string } {
+export interface MemberFormValues {
+  name: string;
+  relation: string;
+  avatarColor: string;
+  avatarImage?: string;
+  routineCheckupDue: string;
+  lastCheckup: string;
+  followUpDue: string;
+  followUpLabel: string;
+}
+
+export function emptyMemberForm(): MemberFormValues {
   const nextYear = new Date();
   nextYear.setFullYear(nextYear.getFullYear() + 1);
   return {
@@ -82,8 +90,6 @@ export function memberToForm(member: FamilyMemberProfile): MemberFormValues {
     avatarImage: member.avatarImage,
   };
 }
-
-export type MemberFormValues = ReturnType<typeof memberToForm>;
 
 export function defaultFollowUpDate(): string {
   const d = new Date();

@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Calendar, ChevronRight, Stethoscope, Trash2 } from "lucide-react";
+import { Calendar, CalendarPlus, ChevronRight, Stethoscope, Trash2 } from "lucide-react";
 import { MemberAvatar } from "@/components/MemberAvatar";
 import type { FamilyMemberProfile } from "@/lib/types";
 import {
   daysUntil,
+  downloadIcs,
   formatDueDate,
   urgencyClass,
   urgencyLabel,
@@ -45,7 +46,24 @@ export function MemberBlock({ member, onRemoveFollowUp }: MemberBlockProps) {
         <li className="flex items-start gap-3 rounded-xl bg-slate-50 px-4 py-3">
           <Stethoscope className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-slate-900">下次常规体检</p>
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-sm font-medium text-slate-900">下次常规体检</p>
+              <button
+                type="button"
+                onClick={() =>
+                  downloadIcs(
+                    `${member.name} 常规体检`,
+                    member.routineCheckupDue,
+                    `家庭健康提醒：${member.name}（${member.relation}）的常规体检日期`
+                  )
+                }
+                className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-brand-600 transition hover:bg-brand-100"
+                title="加入日历"
+              >
+                <CalendarPlus className="h-3.5 w-3.5" />
+                加入日历
+              </button>
+            </div>
             <p className="mt-0.5 text-sm text-slate-600">
               {formatDueDate(member.routineCheckupDue)}
             </p>
@@ -65,17 +83,34 @@ export function MemberBlock({ member, onRemoveFollowUp }: MemberBlockProps) {
                 <p className="text-sm font-medium text-slate-900">
                   {member.followUpLabel ?? "复查"} DDL
                 </p>
-                {onRemoveFollowUp && (
+                <div className="flex shrink-0 items-center gap-1">
                   <button
                     type="button"
-                    onClick={() => onRemoveFollowUp(member.id)}
-                    className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
-                    title="删除复查提醒"
+                    onClick={() =>
+                      downloadIcs(
+                        `${member.name} ${member.followUpLabel ?? "复查"}`,
+                        member.followUpDue!,
+                        `家庭健康提醒：${member.name}（${member.relation}）的${member.followUpLabel ?? "复查"}截止日期`
+                      )
+                    }
+                    className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-amber-700 transition hover:bg-amber-100"
+                    title="加入日历"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    删除
+                    <CalendarPlus className="h-3.5 w-3.5" />
+                    加入日历
                   </button>
-                )}
+                  {onRemoveFollowUp && (
+                    <button
+                      type="button"
+                      onClick={() => onRemoveFollowUp(member.id)}
+                      className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
+                      title="删除复查提醒"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      删除
+                    </button>
+                  )}
+                </div>
               </div>
               <p className="mt-0.5 text-sm text-slate-600">
                 {formatDueDate(member.followUpDue)}

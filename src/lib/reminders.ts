@@ -60,3 +60,56 @@ export function urgencyLabel(days: number): string {
   if (days === 1) return "明天到期";
   return `还有 ${days} 天`;
 }
+
+/**
+ * 生成 .ics 格式的日历文件内容，可直接导入 iPhone/Mac 自带日历
+ * 日历名称固定为「家庭健康」
+ */
+export function buildIcsContent(
+  title: string,
+  dateStr: string,
+  description: string
+): string {
+  const d = new Date(dateStr);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const dateFormatted =
+    `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+  const uid = `health-${Date.now()}@health-app`;
+
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//家庭健康//健康提醒//ZH",
+    "CALSCALE:GREGORIAN",
+    "X-WR-CALNAME:家庭健康",
+    "BEGIN:VEVENT",
+    `UID:${uid}`,
+    `DTSTART;VALUE=DATE:${dateFormatted}`,
+    `DTEND;VALUE=DATE:${dateFormatted}`,
+    `SUMMARY:${title}`,
+    `DESCRIPTION:${description}`,
+    "BEGIN:VALARM",
+    "TRIGGER:-P3D",
+    "ACTION:DISPLAY",
+    `DESCRIPTION:${title} 提醒`,
+    "END:VALARM",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+}
+
+/** 下载 .ics 文件触发系统日历导入 */
+export function downloadIcs(
+  title: string,
+  dateStr: string,
+  description: string
+): void {
+  const content = buildIcsContent(title, dateStr, description);
+  const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${title}.ics`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
